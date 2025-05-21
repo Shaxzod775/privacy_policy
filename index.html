@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Guide: Instagram Messaging API</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Visualization & Content Choices: 
+        - Report Info: Overall API introduction -> Goal: Inform -> Presentation: Text sections, expandable content -> Interaction: Click to expand/collapse -> Justification: Breaks down dense text.
+        - Report Info: Prerequisites (Professional Account, Meta Dev App) -> Goal: Inform -> Presentation: Cards -> Interaction: Static display -> Justification: Clear, concise presentation of requirements.
+        - Report Info: Required Permissions (Table 2.3) -> Goal: Organize/Inform -> Presentation: HTML Table -> Interaction: Static display, clear layout -> Justification: Standard for tabular data.
+        - Report Info: Authentication Flow (Section 3) -> Goal: Explain Process -> Presentation: Numbered step-by-step guide with expandable details -> Interaction: Click to expand step details -> Justification: Clarifies multi-step process.
+        - Report Info: Webhook Events (Table 4.2) -> Goal: Organize/Inform -> Presentation: HTML Table -> Interaction: Static display -> Justification: Standard for tabular data.
+        - Report Info: Sending Message Types (Section 5.3-5.6) -> Goal: Detail Options -> Presentation: Accordion/collapsible sections for each message type -> Interaction: Click to expand -> Justification: Manages extensive list of options.
+        - Report Info: Media Formats/Sizes (Table 5.4) -> Goal: Inform -> Presentation: HTML Table -> Interaction: Static display -> Justification: Standard for technical specifications.
+        - Report Info: Key Limitations (Section 6) -> Goal: Warn/Inform -> Presentation: Grid of highlighted cards -> Interaction: Static display with icons for emphasis -> Justification: Draws attention to critical constraints.
+        - Report Info: Advanced Features (Section 7) -> Goal: Inform -> Presentation: Expandable cards -> Interaction: Click to expand -> Justification: Concise overview with option for detail.
+        - Library/Method: All visual structure and interactivity achieved with Tailwind CSS and Vanilla JavaScript. No Chart.js or Plotly.js needed as the report lacks quantitative data suitable for charting; focus is on structuring textual and procedural information.
+    -->
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .tab-button { transition: all 0.3s ease; }
+        .tab-button.active { border-color: #3b82f6; color: #3b82f6; background-color: #eff6ff; }
+        .tab-button:not(.active):hover { border-color: #9ca3af; background-color: #f9fafb; }
+        .content-section { display: none; }
+        .content-section.active { display: block; }
+        .card { background-color: white; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06); padding: 1.5rem; margin-bottom: 1.5rem; }
+        .table-container { max-height: 400px; overflow-y: auto; }
+        .step-guide .step { border-left: 3px solid #3b82f6; margin-bottom:1rem; padding-left:1rem; }
+        .step-guide .step-title { font-weight: 600; color: #1e40af; cursor: pointer; }
+        .step-guide .step-content { display: none; margin-top: 0.5rem; padding-left: 0.5rem; border-left: 2px solid #e5e7eb; }
+        .accordion-item button { display: flex; justify-content: space-between; width: 100%; text-align: left; }
+        .accordion-content { display: none; }
+        .icon-placeholder { display: inline-block; width: 1em; height: 1em; background-color: #cbd5e1; border-radius: 0.125rem; margin-right: 0.25rem; vertical-align: middle; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased">
+
+    <div class="container mx-auto p-4 sm:p-6 lg:p-8 max-w-6xl">
+        <header class="mb-8 text-center">
+            <h1 class="text-3xl sm:text-4xl font-bold text-blue-700 mb-2">Interactive Guide to Instagram Messaging API</h1>
+            <p class="text-slate-600 text-lg">Explore the essentials of integrating with the Messenger Platform for Instagram.</p>
+        </header>
+
+        <div class="mb-6 bg-white p-4 rounded-lg shadow">
+            <p class="text-sm text-slate-700"><span class="font-semibold text-blue-600">Executive Summary:</span> This guide helps developers use the Messenger Platform for Instagram API to manage messages. It's different from the general Instagram API. Businesses and Creators can use it for customer service, engagement, and sales. Remember, users must message first; brands can only reply.</p>
+        </div>
+
+        <div id="tabs" class="mb-6 flex flex-wrap justify-center border-b border-slate-300">
+            <button data-tab="introduction" class="tab-button active text-sm sm:text-base py-3 px-3 sm:px-5 border-b-2 border-transparent font-medium text-slate-600">Introduction</button>
+            <button data-tab="prerequisites" class="tab-button text-sm sm:text-base py-3 px-3 sm:px-5 border-b-2 border-transparent font-medium text-slate-600">Prerequisites</button>
+            <button data-tab="authentication" class="tab-button text-sm sm:text-base py-3 px-3 sm:px-5 border-b-2 border-transparent font-medium text-slate-600">Authentication</button>
+            <button data-tab="receiving" class="tab-button text-sm sm:text-base py-3 px-3 sm:px-5 border-b-2 border-transparent font-medium text-slate-600">Receiving Messages</button>
+            <button data-tab="sending" class="tab-button text-sm sm:text-base py-3 px-3 sm:px-5 border-b-2 border-transparent font-medium text-slate-600">Sending Messages</button>
+            <button data-tab="considerations" class="tab-button text-sm sm:text-base py-3 px-3 sm:px-5 border-b-2 border-transparent font-medium text-slate-600">Key Considerations</button>
+            <button data-tab="advanced" class="tab-button text-sm sm:text-base py-3 px-3 sm:px-5 border-b-2 border-transparent font-medium text-slate-600">Advanced Features</button>
+            <button data-tab="conclusion" class="tab-button text-sm sm:text-base py-3 px-3 sm:px-5 border-b-2 border-transparent font-medium text-slate-600">Conclusion</button>
+        </div>
+
+        <div id="tab-content">
+            <section id="introduction" class="content-section active">
+                <h2 class="text-2xl font-semibold text-blue-600 mb-4">1. Introduction to Instagram Messaging API</h2>
+                <p class="mb-6 text-slate-700">This section introduces the Messenger Platform for Instagram, its core capabilities, and how it differs from the general Instagram API. Understanding these fundamentals is the first step towards successful integration.</p>
+                
+                <div class="accordion">
+                    <div class="accordion-item card">
+                        <button class="accordion-header text-xl font-semibold text-slate-700 py-2">
+                            <span>1.1 What is the Messenger Platform for Instagram?</span>
+                            <span class="icon-placeholder transform rotate-0 transition-transform duration-300 ease-in-out">▼</span>
+                        </button>
+                        <div class="accordion-content p-4 border-t border-slate-200">
+                            <p>The Messenger Platform for Instagram is a specialized API by Meta for Instagram Professional accounts (Business and Creator) to programmatically manage direct messages. It enables scalable messaging, real-time replies, automation, and CRM integration. It's designed to enhance digital presence, customer service, and conversational commerce.</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item card">
+                        <button class="accordion-header text-xl font-semibold text-slate-700 py-2">
+                            <span>1.2 Key Functionalities and Use Cases</span>
+                            <span class="icon-placeholder transform rotate-0 transition-transform duration-300 ease-in-out">▼</span>
+                        </button>
+                        <div class="accordion-content p-4 border-t border-slate-200">
+                            <ul class="list-disc list-inside space-y-2">
+                                <li><strong>Receiving Messages:</strong> Programmatically get messages sent to the Instagram Professional Inbox.</li>
+                                <li><strong>Responding to Messages:</strong> Reply with text, images, videos, GIFs, audio, stickers, shared posts.</li>
+                                <li><strong>Automation and Chatbots:</strong> Implement auto-replies, quick replies, away messages.</li>
+                                <li><strong>Customer Service & Escalation:</strong> Real-time service, handover to human agents (Handover Protocol).</li>
+                                <li><strong>Private Replies:</strong> Send private replies to public posts/comments for lead acquisition or direct engagement.</li>
+                                <li><strong>CRM Integration:</strong> Connect to CRMs for holistic user insights.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="card bg-amber-50 border-l-4 border-amber-400">
+                        <h3 class="text-xl font-semibold text-amber-700 mb-2">1.3 Distinction from General Instagram Platform API</h3>
+                        <p class="text-amber-700">Crucially, the general Instagram Platform API (often used for media retrieval) <strong class="font-bold">does not support direct messaging</strong>. All messaging capabilities are exclusively available through the <strong class="font-bold">Messenger Platform for Instagram</strong>. This specialized API uses different permissions and endpoints. Understanding this separation is fundamental.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="prerequisites" class="content-section">
+                <h2 class="text-2xl font-semibold text-blue-600 mb-4">2. Prerequisites and Account Setup</h2>
+                <p class="mb-6 text-slate-700">Before you can use the Instagram Messaging API, certain account settings and developer configurations must be in place. This section outlines these essential prerequisites.</p>
+
+                <div class="grid md:grid-cols-2 gap-6 mb-6">
+                    <div class="card">
+                        <h3 class="text-xl font-semibold text-slate-700 mb-2">2.1 Instagram Professional Account</h3>
+                        <p>Your Instagram account must be a <strong class="text-blue-600">Professional account</strong> (either Business or Creator). Standard personal accounts cannot use this API. You can check eligibility via the Conversations API (error `36103` means not eligible).</p>
+                    </div>
+                    <div class="card">
+                        <h3 class="text-xl font-semibold text-slate-700 mb-2">2.2 Meta Developer App</h3>
+                        <p>You need a <strong class="text-blue-600">Meta Developer App</strong>. Create this in the Meta Developer Dashboard. Configure it with Messenger and Instagram products. Key items: App ID, App Secret, App Roles (Admin, Developer, Tester).</p>
+                    </div>
+                </div>
+                
+                <div class="card mb-6">
+                    <h3 class="text-xl font-semibold text-slate-700 mb-3">2.3 Required Permissions</h3>
+                    <p class="mb-3">Your Meta Developer App needs these permissions granted by the Instagram Professional account owner during Facebook Login:</p>
+                    <div class="table-container border border-slate-200 rounded-lg">
+                        <table class="min-w-full divide-y divide-slate-200">
+                            <thead class="bg-slate-100">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Permission Name</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Purpose for Messaging API</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-slate-200">
+                                <tr><td class="px-4 py-3 whitespace-nowrap text-sm"><code>instagram_basic</code></td><td class="px-4 py-3 text-sm">Identify the Instagram account and its basic properties.</td></tr>
+                                <tr><td class="px-4 py-3 whitespace-nowrap text-sm"><code>instagram_manage_messages</code></td><td class="px-4 py-3 text-sm">Core permission for all messaging operations (send, receive, manage).</td></tr>
+                                <tr><td class="px-4 py-3 whitespace-nowrap text-sm"><code>pages_manage_metadata</code></td><td class="px-4 py-3 text-sm">Manage metadata for the linked Facebook Page.</td></tr>
+                                <tr><td class="px-4 py-3 whitespace-nowrap text-sm"><code>pages_show_list</code></td><td class="px-4 py-3 text-sm">Retrieve list of Facebook Pages to identify the correct one.</td></tr>
+                                <tr><td class="px-4 py-3 whitespace-nowrap text-sm"><code>business_management</code></td><td class="px-4 py-3 text-sm">Often implicitly required for managing professional assets.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card bg-sky-50 border-l-4 border-sky-400">
+                    <h3 class="text-xl font-semibold text-sky-700 mb-2">2.4 Enabling Message Control Settings (Crucial!)</h3>
+                    <p class="text-sky-700">A manual step is required on the Instagram Professional account: The <strong class="font-bold">"Connected Tools"</strong> toggle under message control settings (in the native Instagram app) <strong class="font-bold">must be enabled</strong>. This links the API to the account.</p>
+                </div>
+            </section>
+
+            <section id="authentication" class="content-section">
+                <h2 class="text-2xl font-semibold text-blue-600 mb-4">3. Authentication and Access Tokens</h2>
+                <p class="mb-6 text-slate-700">Secure authentication is vital. This involves the Business Login for Instagram flow and obtaining specific access tokens. This section details how to get the necessary tokens to authorize your API calls.</p>
+
+                <div class="card step-guide">
+                    <h3 class="text-xl font-semibold text-slate-700 mb-3">Authentication Flow:</h3>
+                    <div class="step">
+                        <div class="step-title accordion-header"><span>Step 1: Business Login for Instagram Flow Overview</span><span class="icon-placeholder transform rotate-0 transition-transform duration-300 ease-in-out">▼</span></div>
+                        <div class="step-content accordion-content">
+                            <p>This flow guides the user to:
+                                <ul class="list-disc list-inside ml-4 mt-1">
+                                    <li>Convert to Instagram Professional account (if needed).</li>
+                                    <li>Create/connect a Facebook Page.</li>
+                                    <li>Connect the Facebook Page to the Instagram Professional account.</li>
+                                </ul>
+                                While messages flow to the Instagram inbox, the Facebook Page is a technical gateway for API authentication and token acquisition.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-title accordion-header"><span>Step 2: Obtain a User Access Token</span><span class="icon-placeholder transform rotate-0 transition-transform duration-300 ease-in-out">▼</span></div>
+                        <div class="step-content accordion-content">
+                            <ol class="list-decimal list-inside ml-4 mt-1 space-y-1">
+                                <li>Sign into your Facebook Developer account and open your app.</li>
+                                <li>Trigger the Facebook Login modal for the Instagram account owner.</li>
+                                <li>Ensure your Facebook Developer account has at least "Moderate" access on the Facebook Page linked to the Instagram account.</li>
+                                <li>The Instagram account owner grants required permissions (<code>instagram_basic</code>, <code>instagram_manage_messages</code>, <code>pages_manage_metadata</code>).</li>
+                                <li>Capture the returned User Access Token.</li>
+                            </ol>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-title accordion-header"><span>Step 3: Retrieve the Page Access Token (PAT)</span><span class="icon-placeholder transform rotate-0 transition-transform duration-300 ease-in-out">▼</span></div>
+                        <div class="step-content accordion-content">
+                            <ol class="list-decimal list-inside ml-4 mt-1 space-y-2">
+                                <li>Use the User Access Token from Step 2.</li>
+                                <li>Send <code>GET</code> request to <code>/me/accounts</code> to list Pages.
+                                    <pre class="bg-slate-100 p-2 rounded text-xs overflow-x-auto my-1">curl -i -X GET "https://graph.facebook.com/v9.0/me/accounts?access_token={user-access-token}"</pre>
+                                </li>
+                                <li>Identify the <code>id</code> of the Facebook Page connected to the Instagram account.</li>
+                                <li>Send <code>GET</code> request to <code>/{page-id}?fields=access_token</code> using your User Access Token.
+                                    <pre class="bg-slate-100 p-2 rounded text-xs overflow-x-auto my-1">curl -i -X GET "https://graph.facebook.com/{page-id}?fields=access_token&access_token={user-access-token}"</pre>
+                                </li>
+                                <li>The response includes the Page Access Token (PAT).</li>
+                            </ol>
+                        </div>
+                    </div>
+                     <div class="step !border-red-500">
+                        <div class="step-title accordion-header !text-red-700"><span>Important: Understanding Token Lifespans</span><span class="icon-placeholder transform rotate-0 transition-transform duration-300 ease-in-out">▼</span></div>
+                        <div class="step-content accordion-content">
+                            <p>If a short-lived User Access Token is used, the PAT will also be short-lived (typically 1 hour). For continuous access, generate a <strong class="font-semibold">long-lived Page Access Token</strong>. These do not expire and are recommended for production.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="receiving" class="content-section">
+                <h2 class="text-2xl font-semibold text-blue-600 mb-4">4. Receiving Messages via Webhooks</h2>
+                <p class="mb-6 text-slate-700">The API uses webhooks to notify your application about incoming messages and other events in real-time. This section explains how to set up and handle these notifications.</p>
+
+                <div class="accordion">
+                    <div class="accordion-item card">
+                        <button class="accordion-header text-xl font-semibold text-slate-700 py-2">
+                            <span>4.1 Webhook Setup Overview</span>
+                            <span class="icon-placeholder transform rotate-0 transition-transform duration-300 ease-in-out">▼</span>
+                        </button>
+                        <div class="accordion-content p-4 border-t border-slate-200">
+                            <p>When an Instagram user messages your Professional account, Meta sends a webhook notification (JSON payload) to your designated server. This payload includes the sender's Instagram-scoped ID (IGSID) and message content. Your server must be publicly accessible and validate incoming requests (verify token, signature).</p>
+                            <p class="mt-2 font-semibold">Flow:</p>
+                            <ol class="list-decimal list-inside ml-4 mt-1">
+                                <li>User sends message to Instagram Professional Account.</li>
+                                <li>Meta's server triggers an event.</li>
+                                <li>Webhook notification (JSON) sent to your app's webhook URL.</li>
+                                <li>Your app parses IGSID and message content to reply.</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item card">
+                        <button class="accordion-header text-xl font-semibold text-slate-700 py-2">
+                            <span>4.2 Subscribing to Webhook Events</span>
+                            <span class="icon-placeholder transform rotate-0 transition-transform duration-300 ease-in-out">▼</span>
+                        </button>
+                        <div class="accordion-content p-4 border-t border-slate-200">
+                            <p class="mb-3">Subscribe to these events in your Meta Developer Dashboard:</p>
+                            <div class="table-container border border-slate-200 rounded-lg">
+                                <table class="min-w-full divide-y divide-slate-200">
+                                    <thead class="bg-slate-100">
+                                        <tr>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Event Name</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Typical Use Case</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-slate-200">
+                                        <tr><td class="px-4 py-3 text-sm"><code>messages</code></td><td class="px-4 py-3 text-sm">Core for receiving all inbound text/media messages.</td></tr>
+                                        <tr><td class="px-4 py-3 text-sm"><code>messaging_optins</code></td><td class="px-4 py-3 text-sm">For specific opt-in flows.</td></tr>
+                                        <tr><td class="px-4 py-3 text-sm"><code>messaging_postbacks</code></td><td class="px-4 py-3 text-sm">User taps a button in a structured message.</td></tr>
+                                        <tr><td class="px-4 py-3 text-sm"><code>messaging_reactions</code></td><td class="px-4 py-3 text-sm">User adds/removes a message reaction.</td></tr>
+                                        <tr><td class="px-4 py-3 text-sm"><code>messaging_referrals</code></td><td class="px-4 py-3 text-sm">Messages from referral points (e.g., Ads).</td></tr>
+                                        <tr><td class="px-4 py-3 text-sm"><code>messaging_seen</code></td><td class="px-4 py-3 text-sm">Message sent by your app has been seen.</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item card">
+                        <button class="accordion-header text-xl font-semibold text-slate-700 py-2">
+                            <span>4.3 Handling Incoming Message Notifications</span>
+                            <span class="icon-placeholder transform rotate-0 transition-transform duration-300 ease-in-out">▼</span>
+                        </button>
+                        <div class="accordion-content p-4 border-t border-slate-200">
+                            <p>Your webhook server parses the JSON payload (IGSID, message content). Based on this, implement logic for automated replies, logging, or human agent escalation (Handover Protocol).</p>
+                            <p class="mt-2 p-3 bg-sky-50 border border-sky-200 rounded-md text-sm"><strong class="font-semibold text-sky-700">Note for Creator Accounts:</strong> An initial API request using the Instagram Conversations API must be sent *before* the Creator account can receive webhooks.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="sending" class="content-section">
+                <h2 class="text-2xl font-semibold text-blue-600 mb-4">5. Sending Messages via the API</h2>
+                <p class="mb-6 text-slate-700">This section covers how to programmatically send various types of messages, including text, media, stickers, and shared posts, using the API endpoints.</p>
+
+                <div class="accordion">
+                    <div class="accordion-item card">
+                        <button class="accordion-header text-lg font-semibold text-slate-700 py-2">
+                            <span>5.1 Base URL and Endpoints</span>
+                            <span class="icon-placeholder transform rotate-0 transition-transform duration-300 ease-in-out">▼</span>
+                        </button>
+                        <div class="accordion-content p-4 border-t border-slate-200">
+                            <p>All endpoints use <code>graph.instagram.com</code> host.</p>
+                            <p class="mt-2">Primary Endpoints (POST requests):</p>
+                            <ul class="list-disc list-inside ml-4 mt-1">
+                                <li><code>/&lt;IG_ID&gt;/messages</code>: Main endpoint. Requires <code>recipient:{id:&lt;IGSID&gt;}</code>, <code>message:{&lt;MESSAGE_ELEMENTS&gt;}</code>.</li>
+                                <li><code>/me/messages</code>: Alternative, resolves to authenticated account. Same parameters.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item card">
+                        <button class="accordion-header text-lg font-semibold text-slate-700 py-2">
+                            <span>5.2 Authentication for Sending</span>
+                            <span class="icon-placeholder transform rotate-0 transition-transform duration-300 ease-in-out">▼</span>
+                        </button>
+                        <div class="accordion-content p-4 border-t border-slate-200">
+                            <p>Requires an Instagram User Access Token (from someone authorized to send messages from the Professional account) in the <code>Authorization</code> header: <code>Bearer &lt;INSTAGRAM_USER_ACCESS_TOKEN&gt;</code>.</p>
+                            <p class="mt-2">Required parameters in request body:</p>
+                            <ul class="list-disc list-inside ml-4 mt-1">
+                                <li><code>recipient:{id:&lt;IGSID&gt;}</code> (IGSID of the user to message)</li>
+                                <li><code>message:{&lt;MESSAGE_ELEMENTS&gt;}</code> (message content object)</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item card">
+                        <button class="accordion-header text-lg font-semibold text-slate-700 py-2">
+                            <span>5.3 Sending Text Messages</span>
+                            <span class="icon-placeholder transform rotate-0 transition-transform duration-300 ease-in-out">▼</span>
+                        </button>
+                        <div class="accordion-content p-4 border-t border-slate-200">
+                            <p><code>POST</code> to <code>/&lt;IG_ID&gt;/messages</code>. Message body: <code>{"text":"&lt;TEXT_OR_LINK&gt;"}</code>.</p>
+                            <p class="mt-1 text-sm">Constraints: UTF-8 encoded, max 1000 bytes. Links must be valid URLs.</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item card">
+                        <button class="accordion-header text-lg font-semibold text-slate-700 py-2">
+                            <span>5.4 Sending Media (Images, Audio, Video, GIFs)</span>
+                            <span class="icon-placeholder transform rotate-0 transition-transform duration-300 ease-in-out">▼</span>
+                        </button>
+                        <div class="accordion-content p-4 border-t border-slate-200">
+                            <p><code>POST</code> to <code>/&lt;IG_ID&gt;/messages</code>. Message body: <code>attachment</code> object with <code>type</code> (e.g., "image") and <code>payload:{url:"&lt;MEDIA_FILE_URL&gt;"}</code>.</p>
+                            <p class="mt-2 p-2 bg-red-50 border border-red-200 rounded-md text-sm"><strong class="font-semibold text-red-700">Requirement:</strong> The app user (Instagram Professional account) <strong class="font-bold">must own</strong> any media/posts sent.</p>
+                            <h4 class="font-semibold mt-3 mb-1">Supported Formats & Sizes:</h4>
+                             <div class="table-container border border-slate-200 rounded-lg">
+                                <table class="min-w-full divide-y divide-slate-200">
+                                    <thead class="bg-slate-100">
+                                        <tr>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Media Type</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Formats</th>
+                                            <th class="px-4 py-2 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Max Size</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-slate-200">
+                                        <tr><td class="px-4 py-2 text-sm">Audio</td><td class="px-4 py-2 text-sm">aac, m4a, wav, mp4</td><td class="px-4 py-2 text-sm">25MB</td></tr>
+                                        <tr><td class="px-4 py-2 text-sm">Image</td><td class="px-4 py-2 text-sm">png, jpeg, gif</td><td class="px-4 py-2 text-sm">8MB</td></tr>
+                                        <tr><td class="px-4 py-2 text-sm">Video</td><td class="px-4 py-2 text-sm">mp4, ogg, avi, mov, webm</td><td class="px-4 py-2 text-sm">25MB</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item card">
+                        <button class="accordion-header text-lg font-semibold text-slate-700 py-2">
+                            <span>5.5 Sending Stickers and Reactions</span>
+                            <span class="icon-placeholder transform rotate-0 transition-transform duration-300 ease-in-out">▼</span>
+                        </button>
+                        <div class="accordion-content p-4 border-t border-slate-200">
+                            <ul class="list-disc list-inside space-y-2">
+                                <li><strong>Stickers:</strong> Message body: <code>attachment</code> object with <code>type:"like_heart"</code>.</li>
+                                <li><strong>React to Message:</strong> <code>sender_action:"react"</code>, <code>payload:{"message_id":"&lt;MESSAGE_ID&gt;", "reaction":"love"}</code>.</li>
+                                <li><strong>Remove Reaction:</strong> <code>sender_action:"unreact"</code>, <code>payload:{"message_id":"&lt;MESSAGE_ID&gt;"}</code>.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item card">
+                        <button class="accordion-header text-lg font-semibold text-slate-700 py-2">
+                            <span>5.6 Sharing Instagram Posts</span>
+                            <span class="icon-placeholder transform rotate-0 transition-transform duration-300 ease-in-out">▼</span>
+                        </button>
+                        <div class="accordion-content p-4 border-t border-slate-200">
+                           <p><code>POST</code> to <code>/&lt;IG_ID&gt;/messages</code>. Message body: <code>attachment</code> object with <code>type:"MEDIA_SHARE"</code>, <code>payload:{"id":"&lt;POST_ID&gt;"}</code>.</p>
+                           <p class="mt-2 p-2 bg-red-50 border border-red-200 rounded-md text-sm"><strong class="font-semibold text-red-700">Requirement:</strong> The app user (Instagram Professional account) <strong class="font-bold">must own</strong> the post being shared.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="considerations" class="content-section">
+                <h2 class="text-2xl font-semibold text-blue-600 mb-4">6. Key Considerations and Limitations</h2>
+                <p class="mb-6 text-slate-700">Understanding the API's operational nuances and limitations is crucial for successful integration, application design, and compliance. These factors directly impact user experience.</p>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="card border-t-4 border-red-500">
+                        <h3 class="text-lg font-semibold text-red-700 mb-2">⚠️ 6.1 Conversation Scope: 1:1 Only</h3>
+                        <p>Strictly one-on-one conversations. Group messaging is <strong class="font-bold">not supported</strong>. Design for personalized interactions.</p>
+                    </div>
+                    <div class="card border-t-4 border-red-500">
+                        <h3 class="text-lg font-semibold text-red-700 mb-2">⏱️ 6.2 Response Window: 24-Hour Rule</h3>
+                        <p>You have <strong class="font-bold">24 hours to respond</strong> to a user's message. After this, you can't reply until the user messages again. Implement automation/efficient handoff.</p>
+                    </div>
+                    <div class="card border-t-4 border-orange-500">
+                        <h3 class="text-lg font-semibold text-orange-700 mb-2">📂 6.3 Inbox Folder Discrepancies</h3>
+                        <p>API messages don't include native app folder info (Primary/General). API messages aren't marked "Read" in native app until replied to via API. Third-party replies move conversations to "General" in native app.</p>
+                    </div>
+                    <div class="card border-t-4 border-orange-500">
+                        <h3 class="text-lg font-semibold text-orange-700 mb-2">🖼️ 6.4 Media Ownership & Sharing</h3>
+                        <p>Outbound media: Your app user <strong class="font-bold">must own</strong> the content. Inbound shared media: Webhook provides URL only, not full content.</p>
+                    </div>
+                    <div class="card border-t-4 border-yellow-500">
+                        <h3 class="text-lg font-semibold text-yellow-700 mb-2">📊 6.5 Rate Limits</h3>
+                        <p>App-level: 200 calls/hour * number of users. Per-account (send API): 100 calls/second (for high-volume cases). Implement rate-limiting strategies.</p>
+                    </div>
+                    <div class="card border-t-4 border-yellow-500">
+                        <h3 class="text-lg font-semibold text-yellow-700 mb-2">🧪 6.6 Testing Limitations</h3>
+                        <p>Standard Access apps can only interact with users having a role on the app (developer, tester) who also grant permissions and have a role on the IG Pro account. Some features need Advanced Access (via App Review).</p>
+                    </div>
+                    <div class="card border-t-4 border-green-500">
+                        <h3 class="text-lg font-semibold text-green-700 mb-2">📢 6.7 Disclosure for Automated Services</h3>
+                        <p>If required by law, <strong class="font-bold">must disclose</strong> when users interact with an automated service (at conversation start, after time lapse, human-to-bot transition).</p>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="advanced" class="content-section">
+                <h2 class="text-2xl font-semibold text-blue-600 mb-4">7. Advanced Messaging Features</h2>
+                <p class="mb-6 text-slate-700">Beyond basic messaging, the API offers features for more sophisticated and engaging conversational experiences, crucial for customer service and commerce.</p>
+                <div class="accordion">
+                    <div class="accordion-item card">
+                        <button class="accordion-header text-xl font-semibold text-slate-700 py-2">
+                            <span>7.1 Handover Protocol for Human Agent Escalation</span>
+                            <span class="icon-placeholder transform rotate-0 transition-transform duration-300 ease-in-out">▼</span>
+                        </button>
+                        <div class="accordion-content p-4 border-t border-slate-200">
+                            <p>Allows seamless transfer of a conversation from one app/inbox (e.g., chatbot) to another (e.g., human agent's custom inbox). Essential for complex or sensitive issues, ensuring a smooth user experience.</p>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item card">
+                        <button class="accordion-header text-xl font-semibold text-slate-700 py-2">
+                            <span>7.2 Conversational Commerce Features</span>
+                            <span class="icon-placeholder transform rotate-0 transition-transform duration-300 ease-in-out">▼</span>
+                        </button>
+                        <div class="accordion-content p-4 border-t border-slate-200">
+                            <p>Enhance user experience and streamline commerce:</p>
+                            <ul class="list-disc list-inside space-y-2 mt-2">
+                                <li><strong>Quick Replies:</strong> Pre-defined tappable responses to guide conversation.</li>
+                                <li><strong>Persistent Menu:</strong> Fixed menu for easy access to common actions/info.</li>
+                                <li><strong>Ice Breakers:</strong> Suggested prompts when a user first opens a conversation.</li>
+                                <li><strong>Templates:</strong> Structured messages for common use cases (consistency, efficiency).</li>
+                            </ul>
+                            <p class="mt-2">These features reduce friction, guide users, increase engagement, and can improve conversion rates.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="conclusion" class="content-section">
+                <h2 class="text-2xl font-semibold text-blue-600 mb-4">8. Conclusion and Next Steps</h2>
+                <p class="mb-6 text-slate-700">This guide has detailed the essentials for integrating Instagram messaging using the Messenger Platform for Instagram API. Remember the crucial distinction from the general Instagram API. For successful implementation, consider the following next steps.</p>
+                <div class="card">
+                    <ul class="list-disc list-inside space-y-3 text-slate-700">
+                        <li><strong>App Review Process:</strong> Understand and follow Meta's App Review policies for Advanced Access and public deployment.</li>
+                        <li><strong>Error Handling & Logging:</strong> Implement robust error handling for API calls and webhooks, plus comprehensive logging for debugging.</li>
+                        <li><strong>Security Best Practices:</strong> Secure webhook endpoints, protect access tokens, and adhere to Meta's data privacy and consent policies.</li>
+                        <li><strong>Scalability Planning:</strong> Design for API rate limits and potential message volume, especially for high-engagement scenarios.</li>
+                        <li><strong>User Experience Design:</strong> Create intuitive and compliant conversational flows, respecting the 24-hour rule and disclosure requirements.</li>
+                        <li><strong>Explore Advanced Features:</strong> Strategically use Handover Protocol, Quick Replies, Persistent Menus, and Ice Breakers for richer experiences.</li>
+                    </ul>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        const tabs = document.querySelectorAll('.tab-button');
+        const contentSections = document.querySelectorAll('.content-section');
+        const accordions = document.querySelectorAll('.accordion-item');
+        const stepGuides = document.querySelectorAll('.step-guide .step-title');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+
+                contentSections.forEach(section => section.classList.remove('active'));
+                document.getElementById(tab.dataset.tab).classList.add('active');
+            });
+        });
+
+        function toggleAccordion(item) {
+            const content = item.querySelector('.accordion-content');
+            const icon = item.querySelector('.accordion-header .icon-placeholder');
+            const isOpen = content.style.display === 'block';
+            
+            content.style.display = isOpen ? 'none' : 'block';
+            if(icon) {
+                icon.textContent = isOpen ? '▼' : '▲';
+            }
+        }
+        
+        accordions.forEach(item => {
+            const header = item.querySelector('.accordion-header');
+            header.addEventListener('click', () => {
+                toggleAccordion(item);
+            });
+        });
+
+        stepGuides.forEach(header => {
+            header.addEventListener('click', () => {
+                const stepItem = header.parentElement;
+                 toggleAccordion(stepItem);
+            });
+        });
+    </script>
+</body>
+</html>
